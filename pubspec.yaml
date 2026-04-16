@@ -1,0 +1,43 @@
+name: scanner_vfc
+description: App Scanner VFC - Operacao Fantasma
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  audioplayers: ^5.2.1
+  camera: ^0.10.5+5
+  sensors_plus: ^4.0.2
+  url_launcher: ^6.2.5
+  shared_preferences: ^2.2.2
+  flutter_compass: ^0.8.1     # <-- BÚSSOLA MAGNÉTICA
+  video_player: ^2.8.1        # <-- MOTOR DE VÍDEO 4K
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/images/icone.png"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/audio/
+    - assets/videos/          # <-- ROTA PARA O SEU MP4
+
+  fonts:
+    - family: ShareTechMono
+      fonts:
+        - asset: assets/fonts/fonte.ttf
