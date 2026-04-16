@@ -279,10 +279,18 @@ class _VfcScannerScreenState extends State<VfcScannerScreen> {
 
         const Spacer(),
 
-        // 🔘 4. O EJETOR MATRIX 
+        // 🔘 4. O EJETOR MATRIX (BLINDADO PARA WEB PWA)
         GestureDetector(
-          onTap: () { SystemChannels.platform.invokeMethod('SystemNavigator.pop'); },
-          child: Image.asset('assets/images/matrix.png', width: 140, fit: BoxFit.contain),
+          behavior: HitTestBehavior.opaque, // 🛡️ CAMPO DE FORÇA: Impede que cliques vazem
+          onTap: () async { 
+            // ROTA DE FUGA PWA: Ejetar da aba jogando para o Google
+            await launchUrl(Uri.parse('https://www.google.com'), mode: LaunchMode.externalApplication);
+          },
+          child: Container(
+            // Almofada invisível para garantir o clique mesmo que o dedo seja largo
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15), 
+            child: Image.asset('assets/images/matrix.png', width: 140, fit: BoxFit.contain),
+          ),
         ),
 
         const Spacer(),
@@ -507,4 +515,4 @@ class LaserPainter extends CustomPainter {
   
   @override 
   bool shouldRepaint(old) => true;
-}
+}          
