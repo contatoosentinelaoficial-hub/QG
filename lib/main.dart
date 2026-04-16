@@ -226,7 +226,7 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
                     stops: const [0.0, 0.25, 0.5, 0.75, 1.0], 
                   ),
                   borderRadius: BorderRadius.circular(8),
-                  border: BorderSide(color: Colors.greenAccent.withOpacity(0.5), width: 1),
+                  border: Border.all(color: Colors.greenAccent.withOpacity(0.5), width: 1),
                   boxShadow: [
                     BoxShadow(color: Colors.greenAccent.withOpacity(0.2), blurRadius: 10, spreadRadius: 1), 
                   ],
