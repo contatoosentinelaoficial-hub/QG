@@ -36,9 +36,7 @@ flutter:
     - assets/images/
     - assets/audio/
 
-  # A FONTE FOI DESLIGADA TEMPORARIAMENTE PARA EVITAR ERRO DE ARQUIVO FALTANDO.
-  # SE VOCÊ SUBIR A PASTA 'assets/fonts/fonte.ttf' NO GITHUB DEPOIS, PODE LIGAR DE NOVO.
-  # fonts:
-  #   - family: ShareTechMono
-  #     fonts:
-  #       - asset: assets/fonts/fonte.ttf
+  fonts:
+    - family: ShareTechMono
+      fonts:
+        - asset: assets/fonts/fonte.ttf
