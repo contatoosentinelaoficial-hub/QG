@@ -17,13 +17,18 @@ void main() async {
   // 🟢 GARANTE QUE O MOTOR FLUTTER LIGOU ANTES DA INJEÇÃO
   WidgetsFlutterBinding.ensureInitialized();
   
-  // --- ANTENA DO QG: RASTREIO DE CREDENCIAL VIP ---
+  // --- ANTENA DO QG: RASTREIO DE CREDENCIAL BIFURCADA ---
   final prefs = await SharedPreferences.getInstance();
   
-  // Se estiver na Web (PWA) e a URL tiver "?p=v", salva o acesso VIP
   if (kIsWeb) {
-    if (Uri.base.queryParameters['p'] == 'v') {
+    String? p = Uri.base.queryParameters['p']?.toLowerCase();
+    
+    if (p == 'v') {
       await prefs.setBool('salvo_vip', true);
+      await prefs.setString('tipo_plano', 'vitalicio');
+    } else if (p == 'a') {
+      await prefs.setBool('salvo_vip', true);
+      await prefs.setString('tipo_plano', 'anual');
     }
   }
   // ------------------------------------------------
@@ -60,7 +65,8 @@ class BaseTaticaScreen extends StatefulWidget {
 class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerProviderStateMixin {
   int _indiceAtual = 0;
   late AnimationController _gearController;
-  bool _usuarioIsVip = false; // 🛡️ DETECTOR REAL DE STATUS (Lê Web e APK)
+  bool _usuarioIsVip = false; // 🛡️ DETECTOR REAL DE STATUS
+  String _tipoPlano = ''; // 🟢 NOVA VARIÁVEL DE RASTREIO DA ETIQUETA
 
   @override
   void initState() {
@@ -69,13 +75,16 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
     _gearController = AnimationController(vsync: this, duration: const Duration(seconds: 15))..repeat();
   }
 
-  // Puxa da memória se o usuário tem o passaporte VIP
+  // Puxa da memória se o usuário tem o passaporte VIP e qual é o plano
   Future<void> _verificarCredencialVip() async {
     final prefs = await SharedPreferences.getInstance();
     bool isVip = prefs.getBool('salvo_vip') ?? false;
+    String plano = prefs.getString('tipo_plano') ?? '';
+    
     if (mounted) {
       setState(() {
         _usuarioIsVip = AppConfig.isVitalicio || isVip;
+        _tipoPlano = plano;
       });
     }
   }
@@ -136,21 +145,29 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
 
   Widget _buildGear(int i, double screenWidth) {
     List<String> imgs = ['gear_bronze.png', 'gear_prata.png', 'gear_ouro.png'];
-    List<String> labels = ['SCANNER', 'MISSÕES', _usuarioIsVip ? 'VITALÍCIO' : 'UPGRADE'];
     
-    // 🟢 CÁLCULO DINÂMICO: A engrenagem terá no máximo 22% da tela (evita esmagar os botões)
+    // 🟢 RÓTULO INTELIGENTE
+    String labelGear = 'UPGRADE';
+    if (_usuarioIsVip) {
+      labelGear = (_tipoPlano == 'anual') ? 'ANUAL' : 'VITALÍCIO';
+    }
+    List<String> labels = ['SCANNER', 'MISSÕES', labelGear];
+    
+    // 🟢 CÁLCULO DINÂMICO
     double gearSize = screenWidth * 0.22; 
-    if (gearSize > 90) gearSize = 90; // Trava o crescimento em telas grandes
+    if (gearSize > 90) gearSize = 90; 
 
     return GestureDetector(
       onTap: () async {
         if (i == 2) {
-          // 🟢 A BIFURCAÇÃO TÁTICA
-          if (!_usuarioIsVip) {
+          // 🟢 A BIFURCAÇÃO TÁTICA E UPSELL
+          if (!_usuarioIsVip || _tipoPlano == 'anual') {
             if (kIsWeb) {
               _abrirPainelElite(context); 
             } else {
-              launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication);
+              // Tiro direto do APK Nativo
+              String linkAlvo = (_tipoPlano == 'anual') ? AppConfig.linkCheckoutVitalicio : AppConfig.linkCheckoutCombo;
+              launchUrl(Uri.parse(linkAlvo), mode: LaunchMode.externalApplication);
             }
           }
         } else { 
@@ -189,6 +206,18 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
 
   // 🛡️ O BOTTOMSHEET DE CONVERSÃO TÁTICA (Agora com Scroll Anti-Travamento)
   void _abrirPainelElite(BuildContext context) {
+    
+    // 🟢 DEFINE O TEXTO E O LINK BASEADO NA ETIQUETA DO SOLDADO
+    String textoExplicativo = "Você está operando no Modo de Reconhecimento. O diagnóstico profundo, a Terapia de Choque e as rotas de fuga da sua procrastinação estão protegidos sob criptografia. Para romper essa barreira e forjar disciplina real, adquira o Arsenal Completo:";
+    String textoBotao = "SAIA DA MATRIX. DESBLOQUEIO AGORA!";
+    String linkEjetor = AppConfig.linkCheckoutCombo;
+
+    if (_tipoPlano == 'anual') {
+       textoExplicativo = "O seu acesso atual é de 12 meses. O verdadeiro controle exige compromisso perpétuo. Quebre as correntes do tempo e garanta seu passe Vitalício para o QG Digital.";
+       textoBotao = "FORJAR ACESSO VITALÍCIO";
+       linkEjetor = AppConfig.linkCheckoutVitalicio;
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.black.withOpacity(0.95),
@@ -210,9 +239,9 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
                 style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 18, fontFamily: 'ShareTechMono'),
               ),
               const SizedBox(height: 15),
-              const Text(
-                "Você está operando no Modo de Reconhecimento. O diagnóstico profundo, a Terapia de Choque e as rotas de fuga da sua procrastinação estão protegidos sob criptografia. Para romper essa barreira e forjar disciplina real, adquira o Arsenal Completo:",
-                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+              Text(
+                textoExplicativo, // Texto Inteligente
+                style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
               ),
               const SizedBox(height: 20),
               _itemRecurso(Icons.radar, "APP SCANNER VFC (Elite)", "Desbloqueio das 28 Missões e Áudios Táticos."),
@@ -226,11 +255,11 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
               const Text("🍎 Apple (iOS): Acesso VIP a este Sistema Web (Sincronização PWA).", style: TextStyle(color: Colors.white54, fontSize: 11)),
               const SizedBox(height: 30),
               
-              // 🟢 O BOTÃO DE AÇO ESCOVADO MATRIX (Agora 100% livre para clique)
+              // 🟢 O BOTÃO DE AÇO ESCOVADO MATRIX (Livre para clique)
               GestureDetector(
                 onTap: () {
                   Navigator.pop(context); 
-                  launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication);
+                  launchUrl(Uri.parse(linkEjetor), mode: LaunchMode.externalApplication); // Link Inteligente
                 },
                 child: Container(
                   width: double.infinity,
@@ -254,10 +283,10 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
                       BoxShadow(color: Colors.greenAccent.withOpacity(0.2), blurRadius: 10, spreadRadius: 1), 
                     ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      "SAIA DA MATRIX. DESBLOQUEIO AGORA!",
-                      style: TextStyle(
+                      textoBotao, // Botão Inteligente
+                      style: const TextStyle(
                         color: Color(0xFF00FF00), 
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
