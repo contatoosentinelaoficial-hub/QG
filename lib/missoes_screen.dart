@@ -388,9 +388,10 @@ class _MissoesScreenState extends State<MissoesScreen> {
               const SizedBox(height: 40),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15)),
-                onPressed: () => launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication),
+                // 🟢 Tiro ajustado para o Vitalício
+                onPressed: () => launchUrl(Uri.parse(AppConfig.linkCheckoutVitalicio), mode: LaunchMode.externalApplication),
                 icon: const Icon(Icons.settings, color: Colors.black),
-                label: const Text("ENGRENAGEM DOURADA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                label: const Text("FORJAR ACESSO VITALÍCIO", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -605,7 +606,8 @@ class CadeadoTatico extends StatelessWidget {
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
                 onPressed: () {
                    Navigator.pop(context);
-                   launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication);
+                   // 🟢 Tiro ajustado para o Combo (Recrutas)
+                   launchUrl(Uri.parse(AppConfig.linkCheckoutCombo), mode: LaunchMode.externalApplication);
                 },
                 child: const Text("ENGRENAGEM DOURADA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               )
