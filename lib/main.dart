@@ -88,6 +88,10 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    // 🟢 INJEÇÃO DE RESPONSIVIDADE: Medindo a tela do soldado
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bottomPadding = MediaQuery.of(context).padding.bottom; // Lê a margem de segurança do celular
+
     return Scaffold(
       body: Stack(
         children: [
@@ -108,18 +112,21 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
           // 🎯 ÁREA CENTRAL 
           Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.only(top: 110, bottom: 200), 
+              // Empurra o conteúdo central para não bater nas engrenagens
+              padding: const EdgeInsets.only(top: 60, bottom: 150), 
               child: _indiceAtual == 0 ? const VfcScannerScreen() : const MissoesScreen(),
             ),
           ),
 
-          // ⚙️ ENGRENAGENS TÁTICAS
+          // ⚙️ ENGRENAGENS TÁTICAS (Agora responsivas e protegidas pela SafeArea)
           Positioned(
-            bottom: 75, left: 0, right: 0,
+            bottom: bottomPadding + 15, // Adapta se o celular tem barra de navegação embaixo
+            left: 0, 
+            right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(3, (i) => _buildGear(i)),
+              children: List.generate(3, (i) => Expanded(child: _buildGear(i, screenWidth))),
             ),
           ),
         ],
@@ -127,20 +134,22 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
     );
   }
 
-  Widget _buildGear(int i) {
+  Widget _buildGear(int i, double screenWidth) {
     List<String> imgs = ['gear_bronze.png', 'gear_prata.png', 'gear_ouro.png'];
-    // 🛡️ Agora a engrenagem lê a variável que cruza os dados da Web e do APK
     List<String> labels = ['SCANNER', 'MISSÕES', _usuarioIsVip ? 'VITALÍCIO' : 'UPGRADE'];
     
+    // 🟢 CÁLCULO DINÂMICO: A engrenagem terá no máximo 22% da tela (evita esmagar os botões)
+    double gearSize = screenWidth * 0.22; 
+    if (gearSize > 90) gearSize = 90; // Trava o crescimento em telas grandes
+
     return GestureDetector(
       onTap: () async {
         if (i == 2) {
-          // 🟢 A BIFURCAÇÃO TÁTICA (Só bloqueia se não for VIP real)
+          // 🟢 A BIFURCAÇÃO TÁTICA
           if (!_usuarioIsVip) {
             if (kIsWeb) {
-              _abrirPainelElite(context); // Se for Isca Web, sobe o Funil
+              _abrirPainelElite(context); 
             } else {
-              // Se for Isca APK, atira direto pro link
               launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication);
             }
           }
@@ -157,16 +166,28 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
               angle: (i == 1 ? -_gearController.value : _gearController.value) * 2 * pi,
               child: child,
             ),
-            child: Opacity(opacity: (_indiceAtual == i || i == 2) ? 1.0 : 0.4, child: Image.asset('assets/images/${imgs[i]}', width: 115)),
+            child: Opacity(
+              opacity: (_indiceAtual == i || i == 2) ? 1.0 : 0.4, 
+              child: Image.asset('assets/images/${imgs[i]}', width: gearSize)
+            ),
           ),
           const SizedBox(height: 5),
-          Text(labels[i], style: TextStyle(color: i == 2 ? Colors.amber : ( _indiceAtual == i ? const Color(0xFF00FF00) : Colors.grey), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+          Text(
+            labels[i], 
+            style: TextStyle(
+              color: i == 2 ? Colors.amber : ( _indiceAtual == i ? const Color(0xFF00FF00) : Colors.grey), 
+              fontSize: 11, // Fonte levemente reduzida para telas finas
+              fontWeight: FontWeight.bold, 
+              letterSpacing: 1.0
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
   }
 
-  // 🛡️ O BOTTOMSHEET DE CONVERSÃO TÁTICA
+  // 🛡️ O BOTTOMSHEET DE CONVERSÃO TÁTICA (Agora com Scroll Anti-Travamento)
   void _abrirPainelElite(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -177,76 +198,80 @@ class _BaseTaticaScreenState extends State<BaseTaticaScreen> with SingleTickerPr
         side: BorderSide(color: Colors.amber, width: 0.5),
       ),
       builder: (context) => Container(
-        padding: const EdgeInsets.fromLTRB(24, 30, 24, 40), 
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "⚠️ ACESSO RESTRITO: PROTOCOLO ELITE",
-              style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 18, fontFamily: 'ShareTechMono'),
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              "Você está operando no Modo de Reconhecimento. O diagnóstico profundo, a Terapia de Choque e as rotas de fuga da sua procrastinação estão protegidos sob criptografia. Para romper essa barreira e forjar disciplina real, adquira o Arsenal Completo:",
-              style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
-            ),
-            const SizedBox(height: 20),
-            _itemRecurso(Icons.radar, "APP SCANNER VFC (Elite)", "Desbloqueio das 28 Missões e Áudios Táticos."),
-            _itemRecurso(Icons.psychology, "A MÁQUINA DA ILUSÃO", "Reprogramação mental e quebra de desculpas."),
-            _itemRecurso(Icons.biotech, "MANUAL BIO-HACK", "Hackeie sua biologia e baixe o cortisol."),
-            const Divider(color: Colors.white24, height: 30),
-            const Text("⚙️ LOGÍSTICA DO SISTEMA:", style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 5),
-            const Text("🤖 Android: App nativo (APK) para biometria profunda.", style: TextStyle(color: Colors.white54, fontSize: 11)),
-            const SizedBox(height: 3),
-            const Text("🍎 Apple (iOS): Acesso VIP a este Sistema Web (Sincronização PWA).", style: TextStyle(color: Colors.white54, fontSize: 11)),
-            const SizedBox(height: 30),
-            
-            // 🟢 O BOTÃO DE AÇO ESCOVADO MATRIX
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context); 
-                launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication);
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.grey[800]!, 
-                      Colors.grey[500]!, 
-                      Colors.grey[300]!, 
-                      Colors.grey[500]!, 
-                      Colors.grey[800]!, 
+        padding: EdgeInsets.fromLTRB(24, 30, 24, MediaQuery.of(context).padding.bottom + 20), 
+        // 🟢 SINGLE CHILD SCROLL VIEW: Garante que nada fique inoperante se a tela for pequena
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "⚠️ ACESSO RESTRITO: PROTOCOLO ELITE",
+                style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 18, fontFamily: 'ShareTechMono'),
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                "Você está operando no Modo de Reconhecimento. O diagnóstico profundo, a Terapia de Choque e as rotas de fuga da sua procrastinação estão protegidos sob criptografia. Para romper essa barreira e forjar disciplina real, adquira o Arsenal Completo:",
+                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              _itemRecurso(Icons.radar, "APP SCANNER VFC (Elite)", "Desbloqueio das 28 Missões e Áudios Táticos."),
+              _itemRecurso(Icons.psychology, "A MÁQUINA DA ILUSÃO", "Reprogramação mental e quebra de desculpas."),
+              _itemRecurso(Icons.biotech, "MANUAL BIO-HACK", "Hackeie sua biologia e baixe o cortisol."),
+              const Divider(color: Colors.white24, height: 30),
+              const Text("⚙️ LOGÍSTICA DO SISTEMA:", style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 5),
+              const Text("🤖 Android: App nativo (APK) para biometria profunda.", style: TextStyle(color: Colors.white54, fontSize: 11)),
+              const SizedBox(height: 3),
+              const Text("🍎 Apple (iOS): Acesso VIP a este Sistema Web (Sincronização PWA).", style: TextStyle(color: Colors.white54, fontSize: 11)),
+              const SizedBox(height: 30),
+              
+              // 🟢 O BOTÃO DE AÇO ESCOVADO MATRIX (Agora 100% livre para clique)
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context); 
+                  launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication);
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.grey[800]!, 
+                        Colors.grey[500]!, 
+                        Colors.grey[300]!, 
+                        Colors.grey[500]!, 
+                        Colors.grey[800]!, 
+                      ],
+                      stops: const [0.0, 0.25, 0.5, 0.75, 1.0], 
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.greenAccent.withOpacity(0.5), width: 1),
+                    boxShadow: [
+                      BoxShadow(color: Colors.greenAccent.withOpacity(0.2), blurRadius: 10, spreadRadius: 1), 
                     ],
-                    stops: const [0.0, 0.25, 0.5, 0.75, 1.0], 
                   ),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.greenAccent.withOpacity(0.5), width: 1),
-                  boxShadow: [
-                    BoxShadow(color: Colors.greenAccent.withOpacity(0.2), blurRadius: 10, spreadRadius: 1), 
-                  ],
-                ),
-                child: const Center(
-                  child: Text(
-                    "SAIA DA MATRIX. DESBLOQUEIO AGORA!",
-                    style: TextStyle(
-                      color: Color(0xFF00FF00), 
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      fontFamily: 'ShareTechMono', 
-                      letterSpacing: 1.0,
-                      shadows: [Shadow(color: Colors.greenAccent, blurRadius: 6)], 
+                  child: const Center(
+                    child: Text(
+                      "SAIA DA MATRIX. DESBLOQUEIO AGORA!",
+                      style: TextStyle(
+                        color: Color(0xFF00FF00), 
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        fontFamily: 'ShareTechMono', 
+                        letterSpacing: 1.0,
+                        shadows: [Shadow(color: Colors.greenAccent, blurRadius: 6)], 
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
