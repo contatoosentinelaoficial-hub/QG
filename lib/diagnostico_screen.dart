@@ -153,7 +153,8 @@ class _DiagnosticoScreenState extends State<DiagnosticoScreen> {
                _trilhaPlayer.stop(); // Corta a tensão
                _vozPlayer.stop();
                Navigator.pop(context); // Ejeta a ovelha pra base
-               launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication); // Dispara o míssil de vendas
+               // 🟢 Tiro apontado para o Combo (Recrutas)
+               launchUrl(Uri.parse(AppConfig.linkCheckoutCombo), mode: LaunchMode.externalApplication); 
             },
             child: const Text("ENGRENAGEM DOURADA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           )
