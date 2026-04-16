@@ -46,7 +46,7 @@ class _VfcScannerScreenState extends State<VfcScannerScreen> {
   }
 
   // ==========================================================
-  // 🛑 MOTOR DE TEMPO E BLOQUEIO VIP
+  // 🛑 MOTOR DE TEMPO E BLOQUEIO VIP (AGORA LÊ A ETIQUETA CERTA)
   // ==========================================================
   Future<void> _verificarBloqueioTempo() async {
     final prefs = await SharedPreferences.getInstance();
@@ -62,13 +62,17 @@ class _VfcScannerScreenState extends State<VfcScannerScreen> {
     }
 
     final diferenca = DateTime.now().difference(dataInicio).inDays;
+    
     bool isVip = prefs.getBool('salvo_vip') ?? false;
-    bool usuarioIsVip = AppConfig.isVitalicio || isVip;
+    String tipoPlano = prefs.getString('tipo_plano') ?? '';
+    
+    // 🟢 Apenas quem tem a etiqueta explícita de 'vitalicio' (ou o APK vitalício) ganha imunidade
+    bool isVitalicio = AppConfig.isVitalicio || (isVip && tipoPlano == 'vitalicio');
 
     if (mounted) {
       setState(() {
-        // Se passou de 365 dias E a ovelha NÃO tem a credencial VIP, ativa o bloqueio total
-        _isBloqueadoAnual = diferenca > 365 && !usuarioIsVip;
+        // A Guilhotina desce se passar de 365 dias E a ovelha NÃO for vitalícia
+        _isBloqueadoAnual = diferenca > 365 && !isVitalicio;
         _isLoadingBloqueio = false;
       });
     }
@@ -190,7 +194,7 @@ class _VfcScannerScreenState extends State<VfcScannerScreen> {
   }
 
   // ==========================================================
-  // 💀 A TELA DA MORTE (BLOQUEIO 365 DIAS)
+  // 💀 A TELA DA MORTE (BLOQUEIO 365 DIAS COM UPGRADE VITALÍCIO)
   // ==========================================================
   Widget _construirTelaDaMorte() {
     return Container(
@@ -206,15 +210,16 @@ class _VfcScannerScreenState extends State<VfcScannerScreen> {
               const Text("SCANNER BLOQUEADO", style: TextStyle(color: Colors.redAccent, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2)),
               const SizedBox(height: 15),
               const Text(
-                "O seu protocolo de 12 meses expirou. O motor biométrico e o fluxo PPG foram desativados por segurança.\n\nRenove o acesso para retomar o controle.",
+                "O seu protocolo de 12 meses expirou. O motor biométrico e o fluxo PPG foram desativados por segurança.\n\nAdquira o passe Vitalício para retomar o controle perpétuo.",
                 textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 15),
               ),
               const SizedBox(height: 40),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15)),
-                onPressed: () => launchUrl(Uri.parse(AppConfig.linkCheckout), mode: LaunchMode.externalApplication),
+                // 🟢 Tiro direto para o Link Vitalício
+                onPressed: () => launchUrl(Uri.parse(AppConfig.linkCheckoutVitalicio), mode: LaunchMode.externalApplication),
                 icon: const Icon(Icons.settings, color: Colors.black),
-                label: const Text("ENGRENAGEM DOURADA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                label: const Text("FORJAR ACESSO VITALÍCIO", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -515,4 +520,4 @@ class LaserPainter extends CustomPainter {
   
   @override 
   bool shouldRepaint(old) => true;
-}          
+}
