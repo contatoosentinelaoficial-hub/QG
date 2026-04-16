@@ -136,11 +136,11 @@ class _MissoesScreenState extends State<MissoesScreen> {
     },
     {
       'titulo': 'O SANGRAMENTO FÍSICO',
-      'conteudo': 'A Ilusão: "O Pix e a aproximação facilitam a vida."\n\nA Verdade: O dinheiro virtual anestesia a dor do gasto. Eles removeram a fricção para que você não sinta o seu recurso escorrer pelo ralo.\n\nDiretriz Tática: Vá a um caixa eletrônico e saque R$ 100 em notas físicas. Hoje e amanhã, pague tudo (café, almoço, padaria) exclusivamente com dinheiro de papel. Sinta a fricção tátil. Veja o papel sair da sua mão e não voltar. Recalibre o peso psicológico do seu dinheiro.'
+      'conteudo': 'A Ilusão: "O Pix e a aproximação facilitam a vida."\n\nA Verdade: O dinheiro virtual anestesia a dor do gasto. Eles removeram a fricção para que você não sinta o seu recurso escorrer pelo ralo.\n\nDiretriz Tática: Vá a um caixa eletrônico e saque R\$ 100 em notas físicas. Hoje e amanhã, pague tudo (café, almoço, padaria) exclusivamente com dinheiro de papel. Sinta a fricção tátil. Veja o papel sair da sua mão e não voltar. Recalibre o peso psicológico do seu dinheiro.'
     },
     {
       'titulo': 'O ABSTINENTE DE CONSUMO',
-      'conteudo': 'A Ilusão: "Preciso comprar coisas pequenas para manter o ânimo alto."\n\nA Verdade: O microconsumo é um band-aid de dopamina para cobrir o vazio existencial.\n\nDiretriz Tática: Dia de Gasto Zero. Nas próximas 24 horas, não compre absolutamente nada. Nem um café, nem um chiclete, nem um app de R$ 4,90. Consuma apenas a comida e a água que já estão dentro da sua casa. Congele o impulso de passar o cartão.'
+      'conteudo': 'A Ilusão: "Preciso comprar coisas pequenas para manter o ânimo alto."\n\nA Verdade: O microconsumo é um band-aid de dopamina para cobrir o vazio existencial.\n\nDiretriz Tática: Dia de Gasto Zero. Nas próximas 24 horas, não compre absolutamente nada. Nem um café, nem um chiclete, nem um app de R\$ 4,90. Consuma apenas a comida e a água que já estão dentro da sua casa. Congele o impulso de passar o cartão.'
     },
     {
       'titulo': 'O INTERROGATÓRIO DE COMPRA',
@@ -148,7 +148,7 @@ class _MissoesScreenState extends State<MissoesScreen> {
     },
     {
       'titulo': 'A AUDITORIA BRUTAL',
-      'conteudo': 'A Ilusão: "São apenas R$ 19,90 por mês, não faz diferença."\n\nA Verdade: As corporações se alimentam do seu esquecimento. A assinatura contínua invisível é o câncer do seu fluxo de caixa.\n\nDiretriz Tática: Pare o que está fazendo. Abra o aplicativo do seu banco. Cancele hoje, agora mesmo, uma assinatura (streaming, aplicativo, revista) que você usa menos de duas vezes por mês. Estanque a hemorragia silenciosa.'
+      'conteudo': 'A Ilusão: "São apenas R\$ 19,90 por mês, não faz diferença."\n\nA Verdade: As corporações se alimentam do seu esquecimento. A assinatura contínua invisível é o câncer do seu fluxo de caixa.\n\nDiretriz Tática: Pare o que está fazendo. Abra o aplicativo do seu banco. Cancele hoje, agora mesmo, uma assinatura (streaming, aplicativo, revista) que você usa menos de duas vezes por mês. Estanque a hemorragia silenciosa.'
     },
     {
       'titulo': 'O VALOR DO SUOR',
