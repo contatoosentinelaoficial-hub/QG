@@ -8,8 +8,8 @@
     "description": "Sistema de Monitoramento Biométrico de Elite.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
-    "icons": [ ... ]
-}
+    "icons": [
+        {
             "src": "icons/Icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
@@ -20,16 +20,9 @@
             "type": "image/png"
         },
         {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
+            "src": "favicon.png",
+            "sizes": "16x16",
+            "type": "image/png"
         }
     ]
 }
